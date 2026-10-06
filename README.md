@@ -3,8 +3,10 @@
 A single-file, headless Blender scene: a night city police chase. Built and tested on
 Blender 4.5.3 LTS, Cycles CPU.
 
-- `scene.py` — the entire scene, animation, cameras and render config. No dependencies
-  outside Blender's bundled Python.
+- `scene.py` — the original single-street version: scene, animation, cameras and
+  render config in one file. No dependencies outside Blender's bundled Python.
+- `epic.py` — expanded version: 5 locations, a 20 car police fleet, 3 helicopters,
+  3 tanks, 2 warships, rebuilt car models and a rebuilt sky.
 - `run.sh` — thin wrapper that calls `scene.py` with a configurable Blender path.
 - `police_chase_v1.mp4` — proof render: 4 s, 480x270, 24 fps, 96 frames.
 
@@ -23,6 +25,33 @@ Blender 4.5.3 LTS, Cycles CPU.
   (frames 53-96)
 - real motion blur, depth of field focused on the cars, AgX view transform, Fog Glow
   bloom in the compositor
+
+## epic.py (expanded version)
+
+Five locations, each with its own geometry, palette and lights:
+
+- `boulevard` — 6 lanes, lit shopfronts, sodium lamps, overpass ahead
+- `downtown` — 4-way junction with cross road, 22 to 70 m towers, cold LED lamps,
+  traffic signals, neon signs, cross traffic
+- `tunnel` — enclosed tube, ceiling light strips, no sky, hard shadows
+- `alley` — brick walls, fire escapes, AC units, wall lamps, dumpsters
+- `harbor` — pier and quay, containers, gantry cranes, oil tanks, water plane,
+  2 warships offshore, moonlit
+
+Ten camera rigs, usable in every location: `rear`, `side`, `headon`, `aerial`,
+`low`, `tele` (200 mm), `wheel` (60 mm), `bumper`, `threequarter`, `drone`.
+
+```bash
+"$BL" -b --factory-startup -noaudio --python epic.py -- batch 640 360 32 CYCLES boulevard "rear:12,aerial:34"
+"$BL" -b --factory-startup -noaudio --python epic.py -- anim 480 270 24 CYCLES downtown
+```
+
+Arguments: `MODE RES_X RES_Y SAMPLES ENGINE LOCATION "camera:frame,..."`.
+Modes: `batch` (stills from the camera list), `anim` (96 frames, two shots),
+`build` (construct only), `timeit` (one timed frame).
+
+Measured: 1,215 to 1,645 objects per location, 22 to 33 s per frame at 640x360 and
+32 samples, Cycles CPU.
 
 ## Install Blender
 
